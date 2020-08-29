@@ -49,9 +49,8 @@ def transE(triplets:np.ndarray,
     :param callbacks: tf.keras.callbacks
     :param keras_model: 만약 tf.keras.Model의 인스턴스를 지정한다면, 해당 모형으로 초기화한후 학습
     :param return_keras_model: tf.keras.Model을 반환할지 유무
-    :param verbose:
-            0 = silent, 1 = progress bar, 2 = one line per epoch.
-            
+    :param verbose: 0 or 1. Verbosity mode. 0 = silent, 1 = progress bar.
+
     :return:
         - node_embedding : node(subject&object)에 대한 임베딩 행렬
         - edge_embedding : edge(relation)에 대한 임베딩 행렬
@@ -108,8 +107,7 @@ def complEx(triplets:np.ndarray,
     :param callbacks: tf.keras.callbacks
     :param keras_model: 만약 tf.keras.Model의 인스턴스를 지정한다면, 해당 모형으로 초기화한후 학습
     :param return_keras_model: tf.keras.Model을 반환할지 유무
-    :param verbose:
-            0 = silent, 1 = progress bar, 2 = one line per epoch.
+    :param verbose: 0 or 1. Verbosity mode. 0 = silent, 1 = progress bar.
 
     :return:
         - node_embedding : node(subject&object)에 대한 임베딩 행렬
