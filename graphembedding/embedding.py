@@ -32,7 +32,8 @@ def transE(triplets:np.ndarray,
            num_epochs=50,
            callbacks=None,
            keras_model=None,
-           return_keras_model=False):
+           return_keras_model=False,
+           verbose=1):
     """
     Node & Edge Embedding using transE Algorithm.
 
@@ -48,6 +49,9 @@ def transE(triplets:np.ndarray,
     :param callbacks: tf.keras.callbacks
     :param keras_model: 만약 tf.keras.Model의 인스턴스를 지정한다면, 해당 모형으로 초기화한후 학습
     :param return_keras_model: tf.keras.Model을 반환할지 유무
+    :param verbose:
+            0 = silent, 1 = progress bar, 2 = one line per epoch.
+            
     :return:
         - node_embedding : node(subject&object)에 대한 임베딩 행렬
         - edge_embedding : edge(relation)에 대한 임베딩 행렬
@@ -63,7 +67,7 @@ def transE(triplets:np.ndarray,
 
     try:
         for i in range(num_epochs):
-            model.fit(dataset(batch_size),
+            model.fit(dataset(batch_size), verbose=verbose,
                       epochs=i+1, initial_epoch=i,
                       shuffle=False, callbacks=callbacks)
     except KeyboardInterrupt:
@@ -86,7 +90,8 @@ def complEx(triplets:np.ndarray,
             num_epochs=50,
             callbacks=None,
             keras_model=None,
-            return_keras_model=False):
+            return_keras_model=False,
+            verbose=1):
     """
     Node & Edge Embedding using complEx Algorithm.
 
@@ -103,6 +108,9 @@ def complEx(triplets:np.ndarray,
     :param callbacks: tf.keras.callbacks
     :param keras_model: 만약 tf.keras.Model의 인스턴스를 지정한다면, 해당 모형으로 초기화한후 학습
     :param return_keras_model: tf.keras.Model을 반환할지 유무
+    :param verbose:
+            0 = silent, 1 = progress bar, 2 = one line per epoch.
+
     :return:
         - node_embedding : node(subject&object)에 대한 임베딩 행렬
         - edge_embedding : edge(relation)에 대한 임베딩 행렬
@@ -119,7 +127,7 @@ def complEx(triplets:np.ndarray,
     try:
         for i in range(num_epochs):
             model.fit(dataset(batch_size, num_negs),
-                      epochs=i+1, initial_epoch=i,
+                      epochs=i+1, initial_epoch=i, verbose=verbose,
                       class_weight={1: 1., 0: 1 / num_negs},
                       shuffle=False, callbacks=callbacks)
     except KeyboardInterrupt:
