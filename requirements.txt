@@ -1,0 +1,5 @@
+pandas
+tqdm
+numpy
+scikit_learn
+tensorflow>=2.2.0
