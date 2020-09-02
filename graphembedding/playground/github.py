@@ -40,3 +40,4 @@ def load_github(name='linux',
 
 def trim_relations(df, event_types):
     return df[df.relation.isin(event_types)]
+  
