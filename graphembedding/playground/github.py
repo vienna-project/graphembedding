@@ -49,20 +49,20 @@ def trim_relations(df, event_types):
 
 def kcore_sampling(df, k_core=5):
     print("Start K-core Sampling", flush=True)
-    pbar = tqdm()
 
-    while True:
-        prev_counts = len(df)
-        if prev_counts == 0:
-            raise ValueError("No data remains")
+    with tqdm() as pbar:
+        while True:
+            prev_counts = len(df)
+            if prev_counts == 0:
+                raise ValueError("No data remains")
 
-        sub_counts = df.subject.value_counts()
-        obj_counts = df.object.value_counts()
-        df = df[df.subject.isin(sub_counts[sub_counts >= k_core].index)
-                & df.object.isin(obj_counts[obj_counts >= k_core].index)]
+            sub_counts = df.subject.value_counts()
+            obj_counts = df.object.value_counts()
+            df = df[df.subject.isin(sub_counts[sub_counts >= k_core].index)
+                    & df.object.isin(obj_counts[obj_counts >= k_core].index)]
 
-        if prev_counts == len(df):
-            # 변화가 없으면 종료
-            return df
-        pbar.update(1)
-    return df
+            if prev_counts == len(df):
+                # 변화가 없으면 종료
+                return df
+            pbar.update(1)
+        return df

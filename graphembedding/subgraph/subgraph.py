@@ -44,7 +44,7 @@ class MinHashSubGraph:
 
         return subgraphs
 
-    def graph2dataframe(self, graph: np.ndarray):
+    def graph2dataframe(self, graph: np.ndarray) -> pd.DataFrame:
         """ graph을 dataframe의 형태로 변환
         """
         if graph.ndim != 2 or graph.shape[1] < 2:
@@ -53,7 +53,7 @@ class MinHashSubGraph:
         graph_df = pd.DataFrame(graph)
         return graph_df.rename({0: 'head', 1: 'tail'}, axis=1)
 
-    def assign_cluster_ids(self, graph_df: pd.DataFrame):
+    def assign_cluster_ids(self, graph_df: pd.DataFrame) -> pd.DataFrame:
         """ graph의 head 별로 num_sigs개 cluster id를 부여
         """
         cluster_series = self._apply_minhash(graph_df)
@@ -61,14 +61,14 @@ class MinHashSubGraph:
         cluster_df = self._cluster_series2dataframe(cluster_series)
         return cluster_df
 
-    def _apply_minhash(self, graph_df: pd.DataFrame):
+    def _apply_minhash(self, graph_df: pd.DataFrame) -> pd.Series:
         generate_minhash = MinHash(self.num_clusters, self.random_seed)
         if self.verbose:
             return graph_df.groupby('head')['tail'].progress_apply(generate_minhash)
         else:
             return graph_df.groupby('head')['tail'].apply(generate_minhash)
 
-    def _cluster_series2dataframe(self, cluster_series):
+    def _cluster_series2dataframe(self, cluster_series) -> pd.DataFrame:
         """ cluster series를 cluster dataframe으로 변환
         """
         clusters = [cluster_series.apply(lambda x: x[i]) for i in range(self.num_clusters)]
@@ -123,5 +123,5 @@ class MinHashSubGraph:
         df = df[df['head'].isin(head_counts[head_counts >= self.k_core].index)
                 & df['tail'].isin(tail_counts[tail_counts >= self.k_core].index)]
 
-        return df.value
+        return df.values
 
