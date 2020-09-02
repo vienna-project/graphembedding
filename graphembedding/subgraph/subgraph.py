@@ -7,6 +7,7 @@ import pandas as pd
 import numpy as np
 from tqdm import tqdm
 from .minhash import MinHash
+tqdm.pandas()
 
 
 class MinHashSubGraph:
