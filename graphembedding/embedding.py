@@ -24,7 +24,7 @@ That's all.
 
 
 def transE(triplets:np.ndarray,
-           embed_size=50,
+           embed_size=20,
            ord='l1',
            margin=1,
            learning_rate=2e-1,
@@ -81,9 +81,9 @@ def transE(triplets:np.ndarray,
 
 
 def complEx(triplets:np.ndarray,
-            embed_size=50,
+            embed_size=20,
             n3_reg=1e-3,
-            learning_rate=5e-1,
+            learning_rate=2e-1,
             num_negs=20,
             batch_size=1024,
             num_epochs=50,

@@ -4,13 +4,13 @@ Author : SangJae Kang
 Mail : craftsangjae@gmail.com
 """
 import numpy as np
-from .layers import TransEScore, ComplExDotScore
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Input
 from tensorflow.keras.layers import Embedding
 from tensorflow.keras.losses import BinaryCrossentropy
 from tensorflow.keras.initializers import RandomUniform, GlorotUniform
 from tensorflow.keras.optimizers import Adagrad
+from .layers import TransEScore, ComplExDotScore
 
 
 def create_transEModel(num_nodes,
