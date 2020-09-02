@@ -5,8 +5,8 @@ Mail : craftsangjae@gmail.com
 """
 import pandas as pd
 import numpy as np
-from .dataset import TransEDataset, ComplExDataset
-from .models import create_transEModel, create_complExModel
+from .dataset import TransEDataset, ComplExDataset, ImplExDataset
+from .models import create_transEModel, create_complExModel, create_implExModel
 
 
 """
@@ -122,6 +122,68 @@ def complEx(triplets:np.ndarray,
     else:
         model = keras_model
 
+    try:
+        for i in range(num_epochs):
+            model.fit(dataset(batch_size, num_negs),
+                      epochs=i+1, initial_epoch=i, verbose=verbose,
+                      class_weight={1: 1., 0: 1 / num_negs},
+                      shuffle=False, callbacks=callbacks)
+    except KeyboardInterrupt:
+        pass
+
+    node_embedding, edge_embedding = weight2embedding(model, dataset)
+
+    if return_keras_model:
+        return node_embedding, edge_embedding, model
+    else:
+        return node_embedding, edge_embedding
+
+
+def implEx(triplets:np.ndarray,
+           embed_size=20,
+           n3_reg=1e-3,
+           learning_rate=2e-1,
+           num_negs=20,
+           alpha=1.,
+           beta=1.,
+           batch_size=1024,
+           num_epochs=50,
+           callbacks=None,
+           keras_model=None,
+           return_keras_model=False,
+           verbose=1):
+    """
+    Node & Edge Embedding using implEx Algorithm.
+
+    reference : custom Algorithm. ALS for Implicit Algorithm + complEx algorithm
+
+    :param triplets: 각 행이 (subject, relation, object, count)으로 이루어진 (N, 4) np.ndarray
+    :param embed_size: 임베딩 벡터의 크기
+    :param n3_reg: tensor nuclear 3-norms 정규화의 크기
+            - reference : Canonical Tensor Decomposition for Knowledge Base Completion(2018)
+    :param learning_rate:  손실 함수 내 margin의 크기
+    :param num_negs: Negative Sampling의 갯수
+    :param alpha: 1.
+    :param beta: 1.
+    :param batch_size: 배치 크기
+    :param num_epochs: 학습 횟수
+    :param callbacks: tf.keras.callbacks
+    :param keras_model: 만약 tf.keras.Model의 인스턴스를 지정한다면, 해당 모형으로 초기화한후 학습
+    :param return_keras_model: tf.keras.Model을 반환할지 유무
+    :param verbose: 0 or 1. Verbosity mode. 0 = silent, 1 = progress bar.
+
+    :return:
+        - node_embedding : node(subject&object)에 대한 임베딩 행렬
+        - edge_embedding : edge(relation)에 대한 임베딩 행렬
+        - [model] : 학습에 이용된 tf.keras.Model
+    """
+    dataset = ImplExDataset(triplets)
+
+    if keras_model is None:
+        model = create_implExModel(len(dataset.nodes), len(dataset.edges),
+                                   embed_size, n3_reg, learning_rate, num_negs, alpha, beta)
+    else:
+        model = keras_model
     try:
         for i in range(num_epochs):
             model.fit(dataset(batch_size, num_negs),

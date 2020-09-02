@@ -4,6 +4,8 @@ Author : SangJae Kang
 Mail : craftsangjae@gmail.com
 """
 import numpy as np
+import tensorflow as tf
+from tensorflow.keras import backend as K
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Input
 from tensorflow.keras.layers import Embedding
@@ -93,5 +95,52 @@ def create_complExModel(num_nodes,
     # Compile complEx Model
     loss = BinaryCrossentropy(from_logits=True, reduction='sum')
     model.compile(optimizer=Adagrad(learning_rate), loss=loss, metrics=[loss])
+
+    return model
+
+
+def create_implExModel(num_nodes,
+                       num_edges,
+                       embed_size=50,
+                       n3_reg=1e-3,
+                       learning_rate=5e-1,
+                       num_negs=50,
+                       alpha=1.,
+                       beta=1.):
+    # Build complEx Model
+    sub_inputs = Input(shape=(), name='subject')
+    obj_inputs = Input(shape=(), name='object')
+    rel_inputs = Input(shape=(), name='relation')
+    cnt_inputs = Input(shape=(), name='count')
+    y_true_inputs = Input(shape=(), name='label')
+    inputs = {"subject": sub_inputs, "object": obj_inputs,
+              "relation": rel_inputs, "count": cnt_inputs,
+              "label": y_true_inputs}
+
+    node_layer = Embedding(input_dim=num_nodes,
+                           output_dim=embed_size,
+                           embeddings_initializer=GlorotUniform(),
+                           name='node_embedding')
+    edge_layer = Embedding(input_dim=num_edges,
+                           output_dim=embed_size,
+                           embeddings_initializer=GlorotUniform(),
+                           name='edge_embedding')
+
+    sub_embed = node_layer(sub_inputs)
+    rel_embed = edge_layer(rel_inputs)
+    obj_embed = node_layer(obj_inputs)
+
+    outputs = ComplExDotScore(n3_reg)([sub_embed, rel_embed, obj_embed])
+    model = Model(inputs, outputs, name='implEx')
+
+    # Compile implEx Model
+    wbce_loss = tf.nn.weighted_cross_entropy_with_logits(y_true_inputs, outputs, num_negs) / num_negs
+    confidence = 1 + alpha * tf.math.log(1 + cnt_inputs / beta)
+
+    loss = K.sum(confidence * wbce_loss)
+    model.add_loss(loss)
+    model.add_metric(K.mean(wbce_loss), 'weighted_binarycrossentropy')
+
+    model.compile(optimizer=Adagrad(learning_rate))
 
     return model
