@@ -35,7 +35,8 @@ class TransEDataset:
             return (dataset
                     .filter(lambda x: x['relation'] == edge_id)
                     .batch(batch_size)
-                    .map(self.sampler))
+                    .map(self.sampler)
+                    .prefetch(AUTOTUNE))
 
         return (tf.data.Dataset.range(len(self.edges))
                 .interleave(_pipeline,
@@ -81,7 +82,8 @@ class ComplExDataset:
             return (dataset
                     .filter(lambda x: x['relation'] == edge_id)
                     .batch(batch_size)
-                    .map(self.sampler(num_negs)))
+                    .map(self.sampler(num_negs))
+                    .prefetch(AUTOTUNE))
 
         return (tf.data.Dataset.range(len(self.edges))
                 .interleave(_pipeline,
